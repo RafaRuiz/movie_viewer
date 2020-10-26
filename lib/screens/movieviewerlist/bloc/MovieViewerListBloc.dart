@@ -11,12 +11,16 @@ class MovieViewerListBloc extends Bloc<MovieViewerListEvent, MovieViewerListStat
   @override
   Stream<MovieViewerListState> mapEventToState(MovieViewerListEvent event) async* {
     if (event is MovieViewerListSearchEvent) {
-      yield MovieViewerListLoadingState();
+      if (event.searchQuery.trim().isEmpty) {
+        yield MovieViewerListInitialState();
+      } else {
+        yield MovieViewerListLoadingState();
 
-      try {
-        yield MovieViewerListSuccessLoadedState(await _movieRepository.getMoviesFromQuery(query: event.searchQuery));
-      } catch (error) {
-        yield MovieViewerListFailedState(error);
+        try {
+          yield MovieViewerListSuccessLoadedState(await _movieRepository.getMoviesFromQuery(query: event.searchQuery));
+        } catch (error) {
+          yield MovieViewerListFailedState(error);
+        }
       }
     } else if (event is MovieViewerSeeDetailsEvent) {
       yield MovieViewerListSeeDetailsState(event.movie);

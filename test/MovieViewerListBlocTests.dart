@@ -48,6 +48,20 @@ void main() {
     expectLater(subject, emitsInOrder(expectedResponse));
   });
 
+  test('On empty search, it shows the initial state', () {
+    String query = "";
+    subject.add(MovieViewerListSearchEvent(query));
+
+    expectLater(subject, emits(isInstanceOf<MovieViewerListInitialState>()));
+  });
+
+  test('On non trimmed empty search, it shows the initial state', () {
+    String query = "  ";
+    subject.add(MovieViewerListSearchEvent(query));
+
+    expectLater(subject, emits(isInstanceOf<MovieViewerListInitialState>()));
+  });
+
   test('On search failed, it showed loading, then failed', () {
     String query = "test movie";
     when(movieRepositoryMock.getMoviesFromQuery(query: query)).thenThrow(DioError());

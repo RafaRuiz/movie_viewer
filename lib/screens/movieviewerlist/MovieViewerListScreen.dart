@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -87,12 +90,44 @@ class MovieViewerListScreen extends StatelessWidget {
         if (state is MovieViewerListSuccessLoadedState) {
           return _listOfMovies(context, state.movies);
         } else if (state is MovieViewerListFailedState) {
-          return Text("Fail");
+          return _failedWidget(state.error);
         } else {
           return Container();
         }
       },
     );
+  }
+
+  Widget _failedWidget(dynamic error) {
+    return Expanded(
+      child: Container(
+        height: double.maxFinite,
+        width: double.maxFinite,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error),
+            SizedBox(
+              height: 10,
+            ),
+            Text(_errorTextForError(error)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _errorTextForError(dynamic error) {
+    if (error is DioError) {
+      if (error.type == DioErrorType.DEFAULT) {
+        return "There's an error with your connection";
+      } else {
+        String moreInfo = error.message;
+        return "There's an error with this request: \n$moreInfo";
+      }
+    } else {
+      return "There's an unknown error";
+    }
   }
 
   Expanded _listOfMovies(BuildContext context, List<MovieAPIModel> movies) {
